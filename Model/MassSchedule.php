@@ -166,17 +166,12 @@ class MassSchedule
             }
         }
 
-        if (!$this->bulkManagement->scheduleBulk($groupId, $operations, $bulkDescription, $userId)) {
-            try {
-                $this->bulkManagement->deleteBulk($groupId);
-            } finally {
-                throw new LocalizedException(
-                    __('Something went wrong while processing the request.')
-                );
-            }
-        }
         $this->saveMultipleOperations->execute($operations);
-
+        if (!$this->bulkManagement->scheduleBulk($groupId, $operations, $bulkDescription, $userId)) {
+            throw new LocalizedException(
+                __('Something went wrong while processing the request.')
+            );
+        }
         /** @var AsyncResponseInterface $asyncResponse */
         $asyncResponse = $this->asyncResponseFactory->create();
         $asyncResponse->setBulkUuid($groupId);
